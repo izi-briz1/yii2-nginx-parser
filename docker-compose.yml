@@ -1,0 +1,98 @@
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: ynp-nginx
+    ports:
+      - "${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./:/var/www/yii2-nginx-parser:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+    networks:
+      - ynp
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: ynp-php
+    volumes:
+      - ./:/var/www/yii2-nginx-parser
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${DB_NAME:-nginx_parser}
+      DB_USER: ${DB_USER:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-app}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - ynp
+
+  queue:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: ynp-queue
+    command: php yii queue/listen --verbose=1 --color=0
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/yii2-nginx-parser
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      DB_HOST: mysql
+      DB_NAME: ${DB_NAME:-nginx_parser}
+      DB_USER: ${DB_USER:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-app}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    networks:
+      - ynp
+
+  mysql:
+    image: mysql:8.0
+    container_name: ynp-mysql
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-nginx_parser}
+      MYSQL_USER: ${DB_USER:-app}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-app}
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - ynp
+
+  redis:
+    image: redis:7-alpine
+    container_name: ynp-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - ynp
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  ynp:
+    driver: bridge
