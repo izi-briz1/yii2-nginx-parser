@@ -35,31 +35,6 @@ services:
     networks:
       - ynp
 
-  queue:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
-    container_name: ynp-queue
-    command: php yii queue/listen --verbose=1 --color=0
-    restart: unless-stopped
-    user: "1000:1000"
-    volumes:
-      - ./:/var/www/yii2-nginx-parser
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    environment:
-      DB_HOST: mysql
-      DB_NAME: ${DB_NAME:-nginx_parser}
-      DB_USER: ${DB_USER:-app}
-      DB_PASSWORD: ${DB_PASSWORD:-app}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-    networks:
-      - ynp
-
   mysql:
     image: mysql:8.0
     container_name: ynp-mysql

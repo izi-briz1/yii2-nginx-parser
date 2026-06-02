@@ -57,14 +57,14 @@ $config = [
         ],
         'db' => $db,
         'redis' => $redis,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'import' => 'import/index',
+                'stats' => 'stats/index',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];
