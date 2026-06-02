@@ -1,7 +1,13 @@
 <?php
 
+use app\components\NginxLogLineParser;
+use yii\gii\Module;
+use yii\log\FileTarget;
+use yii\redis\Cache;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$redis = require __DIR__ . '/redis.php';
 
 $config = [
     'id' => 'basic-console',
@@ -13,19 +19,26 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
     ],
+    'container' => [
+        'singletons' => [
+            NginxLogLineParser::class => NginxLogLineParser::class
+        ]
+    ],
     'components' => [
         'cache' => [
-            'class' => \yii\caching\FileCache::class,
+            'class' => Cache::class,
+            'redis' => 'redis',
         ],
         'log' => [
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
+                    'class' => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
         ],
         'db' => $db,
+        'redis' => $redis,
     ],
     'params' => $params,
     /*
@@ -41,7 +54,7 @@ if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => \yii\gii\Module::class,
+        'class' => Module::class,
     ];
     // configuration adjustments for 'dev' environment
     // requires version `2.1.21` of yii2-debug module

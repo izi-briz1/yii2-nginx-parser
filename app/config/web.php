@@ -1,7 +1,15 @@
 <?php
 
+use app\models\User;
+use yii\gii\Module;
+use yii\log\FileTarget;
+use yii\mail\MailerInterface;
+use yii\redis\Cache;
+use yii\symfonymailer\Mailer;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$redis = require __DIR__ . '/redis.php';
 
 $config = [
     'id' => 'basic',
@@ -9,8 +17,8 @@ $config = [
     'bootstrap' => ['log'],
     'container' => [
         'singletons' => [
-            \yii\mail\MailerInterface::class => [
-                'class' => \yii\symfonymailer\Mailer::class,
+            MailerInterface::class => [
+                'class' => Mailer::class,
                 // send all mails to a file by default.
                 'useFileTransport' => true,
                 'viewPath' => '@app/mail',
@@ -27,26 +35,28 @@ $config = [
             'cookieValidationKey' => 'y2zrBjJ_KnLN1VOtHbMtxPQ6vskrQ-CG',
         ],
         'cache' => [
-            'class' => \yii\caching\FileCache::class,
+            'class' => Cache::class,
+            'redis' => 'redis',
         ],
         'user' => [
-            'identityClass' => \app\models\User::class,
+            'identityClass' => User::class,
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => \yii\mail\MailerInterface::class,
+        'mailer' => MailerInterface::class,
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
                 [
-                    'class' => \yii\log\FileTarget::class,
+                    'class' => FileTarget::class,
                     'levels' => ['error', 'warning'],
                 ],
             ],
         ],
         'db' => $db,
+        'redis' => $redis,
         /*
         'urlManager' => [
             'enablePrettyUrl' => true,
@@ -70,7 +80,7 @@ if (YII_ENV_DEV) {
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => \yii\gii\Module::class,
+        'class' => Module::class,
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
     ];
