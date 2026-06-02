@@ -96,7 +96,7 @@ docker compose up -d --build
 docker compose exec php composer install -d app
 
 # 4. Применить миграции (создаст таблицы logs и files)
-docker compose exec php php app/yii migrate --interactive=0
+docker compose exec php ./app/yii migrate --interactive=0
 ```
 
 После этого приложение доступно на <http://localhost:8080> (порт из `NGINX_PORT`).
@@ -118,13 +118,13 @@ docker compose exec php php app/yii migrate --interactive=0
 
 ## Как пользоваться
 
-1. Откройте `/import`, выберите лог-файл nginx и загрузите его.
+1. Откройте <http://localhost:8080/import>, выберите лог-файл nginx и загрузите его.
 2. Файл сохраняется, считается его хэш и в очередь Redis (`nginx-logs:queue`)
    кладётся id задания. Если файл с таким хэшем уже импортирован - повторного импорта не будет.
 3. Воркер импорта забирает задание, парсит строки и пишет их в БД батчами;
    прогресс пишется в Redis (`import:progress:{id}`).
 4. На странице загрузки прогресс-бар обновляется по AJAX до 100% без перезагрузки.
-5. Перейдите на `/stats` - выберите фильтры (даты, ОС, архитектура, боты), смотрите графики
+5. Перейдите на <http://localhost:8080/stats> - выберите фильтры (даты, ОС, архитектура, боты), смотрите графики
    и таблицу; колонки таблицы сортируются по клику. Результаты агрегаций кэшируются в Redis на 5 минут.
 
 ## Консольные команды
@@ -133,18 +133,18 @@ docker compose exec php php app/yii migrate --interactive=0
 
 ```bash
 # Воркер импорта: блокирующе ждёт задания из очереди Redis и обрабатывает их
-docker compose exec php php app/yii import/listen
+docker compose exec php ./app/yii import/listen
 
 # Параметры воркера:
-#   --batchSize=512   размер батча вставки в БД
-#   --timeout=5       таймаут ожидания задания (сек), 0 - ждать бесконечно
-docker compose exec php php app/yii import/listen --batchSize=1000 --timeout=0
+#  --batchSize=512   размер батча вставки в БД
+#  --timeout=5       таймаут ожидания задания (сек), 0 - ждать бесконечно
+docker compose exec php ./app/yii import/listen --batchSize=1000 --timeout=0
 ```
 
 Миграции:
 
 ```bash
-docker compose exec php php app/yii migrate          # применить
+docker compose exec php ./app/yii migrate
 ```
 
 ## Тесты
@@ -153,7 +153,7 @@ Unit-тесты покрывают классы парсинга строки л
 
 ```bash
 # unit-тесты
-docker compose exec php app/vendor/bin/phpunit
+docker compose exec php ./app/vendor/bin/phpunit -c ./app/phpunit.xml
 ```
 
 ## Структура проекта
