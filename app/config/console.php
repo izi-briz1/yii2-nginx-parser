@@ -13,16 +13,16 @@ $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'container' => [
+        'singletons' => [
+            NginxLogLineParser::class => NginxLogLineParser::class
+        ]
+    ],
     'controllerNamespace' => 'app\commands',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
-    ],
-    'container' => [
-        'singletons' => [
-            NginxLogLineParser::class => NginxLogLineParser::class
-        ]
     ],
     'components' => [
         'cache' => [
