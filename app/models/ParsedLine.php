@@ -4,7 +4,8 @@ namespace app\models;
 
 use yii\base\BaseObject;
 
-class ParsedLine extends BaseObject{
+class ParsedLine extends BaseObject
+{
     public string $ip;
     public string $datetime;
     public string $url;

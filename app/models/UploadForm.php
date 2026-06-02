@@ -19,7 +19,7 @@ class UploadForm extends Model
     /**
      * Ключ Redis-списка с заданиями на импорт. Из него читает консольный воркер.
      */
-    public const QUEUE_KEY = "nginx-logs:queue";
+    public const QUEUE_KEY = 'nginx-logs:queue';
 
     /**
      * @var UploadedFile|null загружаемый лог-файл
@@ -49,16 +49,18 @@ class UploadForm extends Model
                 'skipOnEmpty' => false,
             ],
             [['md5'],
-                function(string $attribute){
-                    if($this->hasErrors('logFile')){
+                function (string $attribute) {
+                    if ($this->hasErrors('logFile')) {
                         return;
                     }
 
                     $this->{$attribute} = md5_file($this->logFile->tempName);
 
-                    if(File::find()->where([
+                    if (
+                        File::find()->where([
                         'md5' => $this->{$attribute}
-                    ])->exists()){
+                        ])->exists()
+                    ) {
                         $this->addError('logFile', 'Этот файл уже был загружен.');
                     }
                 },
@@ -73,7 +75,7 @@ class UploadForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'logFile' => "Лог-файл nginx"
+            'logFile' => 'Лог-файл nginx'
         ];
     }
 
@@ -90,7 +92,7 @@ class UploadForm extends Model
             return null;
         }
 
-        $path = $uploadDir. DIRECTORY_SEPARATOR. $this->md5. ".". $this->logFile->extension;
+        $path = $uploadDir . DIRECTORY_SEPARATOR . $this->md5 . '.' . $this->logFile->extension;
         if (!$this->logFile->saveAs($path)) {
             $this->addError('logFile', 'Не удалось сохранить файл на диск.');
             return null;
@@ -110,7 +112,7 @@ class UploadForm extends Model
         }
 
         // Ставим задание на импорт в очередь Redis (LIST), воркер обработает асинхронно
-        Yii::$app->get("redis")->lpush(self::QUEUE_KEY, (string) $file->id);
+        Yii::$app->get('redis')->lpush(self::QUEUE_KEY, (string) $file->id);
 
         return $file;
     }
@@ -127,7 +129,7 @@ class UploadForm extends Model
 
         $lines = 0;
 
-        while(fgets($fh) !== false){
+        while (fgets($fh) !== false) {
             ++$lines;
         }
 

@@ -53,7 +53,7 @@ class StatsFilter extends Model
             [['dateFrom'], 'default', 'value' => date('Y-m-d', strtotime('-1 month'))],
             [['dateTo'], 'default', 'value' => date('Y-m-d')],
             [['dateFrom', 'dateTo'], 'date', 'format' => 'php:Y-m-d'],
-            [['dateTo'], function($attribute){
+            [['dateTo'], function ($attribute) {
                 $from = DateTime::createFromFormat('Y-m-d', $this->dateFrom);
                 $to = DateTime::createFromFormat('Y-m-d', $this->dateTo);
 
@@ -128,7 +128,7 @@ class StatsFilter extends Model
     {
         $values = (new Query())->select('os')->from('logs')->distinct()->column();
 
-        if(empty($values)){
+        if (empty($values)) {
             return $values;
         }
 
@@ -166,7 +166,7 @@ class StatsFilter extends Model
      */
     public function cacheKey(string $prefix): string
     {
-        return "stats:{$prefix}:". md5(serialize([
+        return "stats:{$prefix}:" . md5(serialize([
             $this->dateFrom,
             $this->dateTo,
             $this->os,

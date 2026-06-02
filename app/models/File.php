@@ -14,11 +14,13 @@ use yii\db\ActiveRecord;
  * @property string $created
  * @property string $updated
  */
-class File extends ActiveRecord{
+class File extends ActiveRecord
+{
     /**
      * @return string
      */
-    public static function tableName(){
+    public static function tableName()
+    {
         return 'files';
     }
 }

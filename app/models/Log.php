@@ -18,11 +18,13 @@ use yii\db\ActiveRecord;
  * @property int $isBot
  * @property string $created
  */
-class Log extends ActiveRecord{
+class Log extends ActiveRecord
+{
     /**
      * @return string
      */
-    public static function tableName(){
+    public static function tableName()
+    {
         return 'logs';
     }
 }

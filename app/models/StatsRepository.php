@@ -48,7 +48,7 @@ class StatsRepository
             ];
         }
 
-        return $this->cached("requestsByDay", function(): array {
+        return $this->cached('requestsByDay', function (): array {
             $query = (new Query())
                 ->select([
                     'd' => new Expression('DATE(datetime)'),
@@ -82,7 +82,7 @@ class StatsRepository
             return ['labels' => [], 'series' => []];
         }
 
-        return $this->cached("topBrowsersShareByDay", function(): array {
+        return $this->cached('topBrowsersShareByDay', function (): array {
             $topBrowsers = $this->topBrowsers(3);
             if (empty($topBrowsers)) {
                 return ['labels' => [], 'series' => []];
@@ -146,7 +146,7 @@ class StatsRepository
             return [];
         }
 
-        return $this->cached("tableByDay", function(): array {
+        return $this->cached('tableByDay', function (): array {
             // Число запросов по дням
             $countsQuery = (new Query())
                 ->select(['d' => new Expression('DATE(datetime)'), 'cnt' => new Expression('COUNT(*)')])

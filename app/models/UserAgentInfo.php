@@ -2,7 +2,8 @@
 
 namespace app\models;
 
-class UserAgentInfo{
+class UserAgentInfo
+{
     /**
      * @var string
      */
@@ -29,7 +30,8 @@ class UserAgentInfo{
      * @param string $browser
      * @param bool $isBot
      */
-    public function __construct(string $architecture, string $os, string $browser, bool $isBot){
+    public function __construct(string $architecture, string $os, string $browser, bool $isBot)
+    {
         $this->architecture = $architecture;
         $this->os = $os;
         $this->browser = $browser;

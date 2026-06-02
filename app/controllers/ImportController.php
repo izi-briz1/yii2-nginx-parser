@@ -43,7 +43,7 @@ class ImportController extends Controller
         if ($this->request->isPost) {
             $model->logFile = UploadedFile::getInstance($model, 'logFile');
 
-            if($model->validate()){
+            if ($model->validate()) {
                 $file = $model->upload();
 
                 if ($file !== null) {
@@ -70,7 +70,7 @@ class ImportController extends Controller
     {
         $this->response->format = Response::FORMAT_JSON;
 
-        $redis = Yii::$app->get("redis"); /* @var $redis \yii\redis\Connection */
+        $redis = Yii::$app->get('redis'); /* @var $redis \yii\redis\Connection */
 
         $progress = $redis->get("import:progress:{$id}");
         if ($progress !== null) {

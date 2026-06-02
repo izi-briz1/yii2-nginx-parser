@@ -46,9 +46,9 @@ class ImportListenAction extends Action
     public function run(): int
     {
         $controller = $this->controller; /* @var $controller \app\commands\ImportController */
-        $controller->stdout("Воркер запущен!". PHP_EOL);
+        $controller->stdout('Воркер запущен!' . PHP_EOL);
 
-        for(
+        for (
             $redis = Yii::$app->get('redis'); /* @var $redis Redis */
             is_array($job = $redis->brpop(UploadForm::QUEUE_KEY, $controller->timeout));
             $job && $this->importFile((int)$job[1])
@@ -67,12 +67,12 @@ class ImportListenAction extends Action
 
         $file = File::findOne($fileId);
         if ($file === null) {
-            $controller->stderr("Файл #{$fileId} не найден!". PHP_EOL);
+            $controller->stderr("Файл #{$fileId} не найден!" . PHP_EOL);
             return;
         }
 
-        if ($file->status === "done") {
-            $controller->stdout("Файл #{$fileId} уже импортирован!". PHP_EOL);
+        if ($file->status === 'done') {
+            $controller->stdout("Файл #{$fileId} уже импортирован!" . PHP_EOL);
             return;
         }
 
@@ -91,7 +91,7 @@ class ImportListenAction extends Action
         $file->save(false, ['status']);
 
         $offset = $file->processed_lines; // уже обработанных строк
-        $controller->stdout("Импорт файла #{$fileId} ({$file->total_lines} строк), старт со строки {$offset}.". PHP_EOL);
+        $controller->stdout("Импорт файла #{$fileId} ({$file->total_lines} строк), старт со строки {$offset}." . PHP_EOL);
 
         try {
             $this->importFromHandle($file, $fh, $offset);
@@ -99,7 +99,7 @@ class ImportListenAction extends Action
             $file->status = 'done';
             $file->save(false, ['status']);
             $this->writeProgress($file);
-            $controller->stdout("Файл #{$fileId} импортирован: {$file->processed_lines} строк.". PHP_EOL);
+            $controller->stdout("Файл #{$fileId} импортирован: {$file->processed_lines} строк." . PHP_EOL);
         } catch (Throwable $e) {
             $this->markFailed($file, $e->getMessage());
         } finally {
@@ -188,7 +188,7 @@ class ImportListenAction extends Action
      */
     private function writeProgress(File $file): void
     {
-        $redis = Yii::$app->get("redis"); /* @var $redis Redis */
+        $redis = Yii::$app->get('redis'); /* @var $redis Redis */
 
         $redis->set("import:progress:{$file->id}", json_encode([
             'status' => $file->status,
@@ -199,10 +199,10 @@ class ImportListenAction extends Action
 
     private function markFailed(File $file, string $reason): void
     {
-        $file->status = "failed";
+        $file->status = 'failed';
         $file->save(false, ['status']);
         $this->writeProgress($file);
-        $this->controller->stderr("Ошибка импорта файла #{$file->id}: {$reason}". PHP_EOL);
+        $this->controller->stderr("Ошибка импорта файла #{$file->id}: {$reason}" . PHP_EOL);
 
         Yii::error("Импорт файла #{$file->id} провален: {$reason}", __METHOD__);
     }
