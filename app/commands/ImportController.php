@@ -18,17 +18,17 @@ use yii\console\Controller;
 class ImportController extends Controller
 {
     /**
-     * Размер батча для вставки в БД.
+     * @var int Размер батча для вставки в БД.
      */
     public int $batchSize = 512;
 
     /**
-     * Таймаут (сек) ожидания задания в brpop. 0 — ждать бесконечно.
+     * @var int Таймаут (сек) ожидания задания в brpop. 0 — ждать бесконечно.
      */
     public int $timeout = 5;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function actions(): array
     {
@@ -38,7 +38,7 @@ class ImportController extends Controller
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function options($actionID): array
     {

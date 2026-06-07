@@ -45,7 +45,7 @@ class StatsFilter extends Model
     public string $bots = self::BOTS_ALL;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function rules(): array
     {
@@ -75,7 +75,7 @@ class StatsFilter extends Model
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function attributeLabels(): array
     {
@@ -120,7 +120,7 @@ class StatsFilter extends Model
     }
 
     /**
-     * Список ОС для выпадающего списка (из реальных данных)
+     * Список ОС для выпадающего списка (на основе реальных данных из db)
      *
      * @return array<string,string>
      */
@@ -162,7 +162,10 @@ class StatsFilter extends Model
     }
 
     /**
-     * Нормализованный ключ для кэша, зависящий от всех параметров фильтра
+     * Ключ для кэша, зависящий от всех параметров фильтра
+     *
+     * @param string $prefix
+     * @return string
      */
     public function cacheKey(string $prefix): string
     {

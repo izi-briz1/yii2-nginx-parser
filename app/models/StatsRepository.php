@@ -16,7 +16,7 @@ use yii\db\Query;
 class StatsRepository
 {
     /**
-     * @var int
+     * @var int Время жизни кеша
      */
     private const CACHE_TTL = 300; # 5 минут
 
@@ -88,7 +88,7 @@ class StatsRepository
                 return ['labels' => [], 'series' => []];
             }
 
-            // Всего запросов по дням (знаменатель)
+            # Всего запросов по дням (знаменатель)
             $totalsQuery = (new Query())
                 ->select(['d' => new Expression('DATE(datetime)'), 'total' => new Expression('COUNT(*)')])
                 ->from('logs')
@@ -102,7 +102,7 @@ class StatsRepository
             }
             $labels = array_keys($totals);
 
-            // Запросы по дням в разрезе топ-браузеров
+            # Запросы по дням в разрезе топ-браузеров
             $byBrowserQuery = (new Query())
                 ->select([
                     'd' => new Expression('DATE(datetime)'),
@@ -114,7 +114,7 @@ class StatsRepository
                 ->groupBy(['d', 'browser']);
             $this->filter->applyTo($byBrowserQuery);
 
-            // counts[browser][date] = c
+            # counts[browser][date] = c
             $counts = [];
             foreach ($byBrowserQuery->all() as $row) {
                 $counts[$row['browser']][$row['d']] = (int) $row['c'];
@@ -147,7 +147,7 @@ class StatsRepository
         }
 
         return $this->cached('tableByDay', function (): array {
-            // Число запросов по дням
+            # Число запросов по дням
             $countsQuery = (new Query())
                 ->select(['d' => new Expression('DATE(datetime)'), 'cnt' => new Expression('COUNT(*)')])
                 ->from('logs')
@@ -205,7 +205,7 @@ class StatsRepository
      */
     private function topPerDay(string $field): array
     {
-        // Оконная функция: ранжируем значения внутри каждого дня по частоте
+        # Оконная функция: ранжируем значения внутри каждого дня по частоте
         $inner = (new Query())
             ->select([
                 'd' => new Expression('DATE(datetime)'),
@@ -233,17 +233,21 @@ class StatsRepository
 
     /**
      * Оборачивает выборку в Redis с TTL 5 минут
+     *
+     * @param string $name
+     * @param callable $fn
+     * @return mixed
      */
     private function cached(string $name, callable $fn): mixed
     {
         # -- нативный кеш через redis ----------------------------------------------------------------------------------
-        # $redis = Yii::$app->redis; /* @var $redis \yii\redis\Connection */
+        # $redis = Yii::$app->get('redis'); /* @var $redis \yii\redis\Connection */
         # $cacheKey = $this->filter->cacheKey($name);
         #
         # $data = $redis->get($cacheKey);
         #
         # if($data === null){
-        #     $redis->set($cacheKey, serialize($fn()), "EX", self::CACHE_TTL);
+        #     $redis->set($cacheKey, serialize($fn()), 'EX', self::CACHE_TTL);
         # }else{
         #     $data = unserialize($data);
         # }

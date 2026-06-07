@@ -15,7 +15,7 @@ use yii\console\ExitCode;
 use yii\redis\Connection as Redis;
 
 /**
- * Standalone-action воркера импорта логов nginx.
+ * Standalone-action воркера импорта логов nginx
  *
  * Демон: блокирующе читает идентификаторы файлов из очереди Redis (LIST) и построчно
  * импортирует их в таблицу logs батчами. Прогресс пишется в files и в Redis для
@@ -31,7 +31,12 @@ class ImportListenAction extends Action
     private NginxLogLineParser $parser;
 
     /**
-     * @param Controller $controller
+     * ImportListenAction constructor.
+     *
+     * @param $id
+     * @param $controller
+     * @param NginxLogLineParser $nginxLogLineParser
+     * @param $config
      */
     public function __construct($id, $controller, NginxLogLineParser $nginxLogLineParser, $config = [])
     {
@@ -42,6 +47,8 @@ class ImportListenAction extends Action
 
     /**
      * Демон: блокирующе читает очередь и обрабатывает файлы по мере поступления.
+     *
+     * @return int
      */
     public function run(): int
     {
@@ -60,6 +67,9 @@ class ImportListenAction extends Action
     /**
      * Импортирует один файл. Идемпотентно: при повторном запуске продолжает
      * с уже обработанной строки (processed_lines), не создавая дублей.
+     *
+     * @param int $fileId
+     * @return void
      */
     private function importFile(int $fileId): void
     {
@@ -109,6 +119,12 @@ class ImportListenAction extends Action
 
     /**
      * Построчно читает файл и вставляет распарсенные строки батчами.
+     *
+     * @param File $file
+     * @param $fh
+     * @param int $offset
+     * @return void
+     * @throws Throwable
      */
     private function importFromHandle(File $file, $fh, int $offset): void
     {
@@ -123,7 +139,7 @@ class ImportListenAction extends Action
         while (($line = fgets($fh)) !== false) {
             ++$lineNo;
 
-            // Возобновление: пропускаем уже обработанные при прошлом запуске строки.
+            # Возобновляем: пропускаем уже обработанные в прошлом запуске строки
             if ($lineNo <= $offset) {
                 continue;
             }
@@ -150,7 +166,7 @@ class ImportListenAction extends Action
             }
         }
 
-        // Остаток + финальная отметка о числе прочитанных строк.
+        # Остаток + финал
         $this->flushBatch($file, $columns, $batch, $lineNo);
     }
 
@@ -158,7 +174,12 @@ class ImportListenAction extends Action
      * Атомарно вставляет батч и обновляет прогресс в той же транзакции,
      * чтобы processed_lines всегда соответствовал зафиксированным данным.
      *
+     * @param File $file
+     * @param array $columns
+     * @param array $batch
+     * @param int $lineNo
      * @return int новое значение processed_lines
+     * @throws Throwable
      */
     private function flushBatch(File $file, array $columns, array $batch, int $lineNo): int
     {
@@ -185,6 +206,9 @@ class ImportListenAction extends Action
 
     /**
      * Дублирует прогресс в Redis для быстрого отображения на странице
+     *
+     * @param File $file
+     * @return void
      */
     private function writeProgress(File $file): void
     {
@@ -197,6 +221,11 @@ class ImportListenAction extends Action
         ]), 'EX', 50 * 60);
     }
 
+    /**
+     * @param File $file
+     * @param string $reason
+     * @return void
+     */
     private function markFailed(File $file, string $reason): void
     {
         $file->status = 'failed';
