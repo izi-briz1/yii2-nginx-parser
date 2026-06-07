@@ -73,7 +73,7 @@
 
 ## Стек
 
-PHP 8.2 (FPM) · Yii2 basic · MySQL 8 · Redis 7 · Nginx 1.27 · Chart.js · Codeception/PHPUnit.
+PHP 8.2 (FPM) / Yii2 basic / MySQL 8 / Redis 7 / Nginx 1.27 / Chart.js / PHPUnit.
 
 Структура: код приложения лежит в каталоге `app/` (стандартный шаблон Yii2 basic),
 инфраструктура (`docker-compose.yml`, `docker/`) - в корне репозитория.
@@ -101,8 +101,8 @@ docker compose exec php ./app/yii migrate --interactive=0
 
 После этого приложение доступно на <http://localhost:8080> (порт из `NGINX_PORT`).
 
-Главная страница со статистикой и графиками: <http://localhost:8080/stats>
-Страница загрузки лог-файла: <http://localhost:8080/import>
+Страница загрузки лог-файла: <http://localhost:8080/import>  
+Страница со статистикой и графиками: <http://localhost:8080/stats>
 
 ## Переменные окружения (`.env`)
 
